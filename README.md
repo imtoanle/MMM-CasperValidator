@@ -11,11 +11,16 @@ To use this module, add the following configuration block to the modules array i
 var config = {
     modules: [
         {
-            module: 'MMM-CasperValidator',
-            config: {
-                // See below for configurable options
-            }
-        }
+			module: "MMM-CasperValidator",
+			header: "Casper Validator",
+			position: "top_right",
+			config: {
+				api_url: 'http://10.0.100.124:9090',
+				prometheus_job: 'casper',
+				updateInterval: 60000,
+				retryDelay: 5000
+			}
+		},
     ]
 }
 ```
