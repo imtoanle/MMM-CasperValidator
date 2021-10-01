@@ -158,7 +158,7 @@ Module.register("MMM-CasperValidator", {
 		trunc = (typeof trunc !== 'undefined') ? trunc : true;
 
 		let valueElement = document.createElement("td");
-		valueElement.className = "value number";
+		valueElement.className = "value number large";
 		valueElement.innerHTML = this.getLatestSerieValue(field_name, trunc);
 
 		return valueElement;
@@ -193,7 +193,7 @@ Module.register("MMM-CasperValidator", {
 
 		if (status == "0") {
 			valueElement.className = "value green";
-			valueElement.innerHTML = "🌟 LATEST VERSION 🌟";
+			valueElement.innerHTML = "✯ LATEST VERSION ✯";
 		} else {
 			valueElement.className = "value red";
 			valueElement.innerHTML = "☠️ UPGRADE ☠️";
