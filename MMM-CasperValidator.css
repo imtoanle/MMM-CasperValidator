@@ -1,0 +1,19 @@
+/*
+ *
+ * MMM-CasperValidator
+ *
+ * Toan Le
+ * MIT Licensed.
+ *
+ * Custom here your css module
+ *
+ */
+
+ .MMM-CasperValidator .tiles label { }
+ .MMM-CasperValidator .tiles .value {
+  font-size: 30px;
+}
+
+.MMM-CasperValidator .tiles .value.number { color: rgb(31, 97, 196); }
+.MMM-CasperValidator .tiles .value.green { color: rgb(55, 135, 45); }
+.MMM-CasperValidator .tiles .value.red { color: rgb(196, 22, 42); }
