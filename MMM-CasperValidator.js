@@ -154,24 +154,14 @@ Module.register("MMM-CasperValidator", {
 		}, nextLoad);
 	},
 
-	createTiles: function(title, field_name, trunc) {
+	createTiles: function(field_name, trunc) {
 		trunc = (typeof trunc !== 'undefined') ? trunc : true;
 
-		let tileElement = document.createElement("div");
-		tileElement.className = "tiles";
-
-		let labelElement = document.createElement("label");
-		labelElement.className = "bright";
-		labelElement.innerHTML = title;
-
-		let valueElement = document.createElement("div");
+		let valueElement = document.createElement("td");
 		valueElement.className = "value number";
 		valueElement.innerHTML = this.getLatestSerieValue(field_name, trunc);
 
-		tileElement.appendChild(labelElement);
-		tileElement.appendChild(valueElement);
-
-		return tileElement;
+		return valueElement;
 	},
 
 	activeStatusPanel: function() {
@@ -224,7 +214,7 @@ Module.register("MMM-CasperValidator", {
 			results.push({era_id: element.metric.era_id, amount: element.values[0][1]});
 		});
 
-		return results;
+		return results.reverse();
 	},
 	getDom: function() {
 		var self = this;
@@ -238,27 +228,31 @@ Module.register("MMM-CasperValidator", {
 			// //             this id defined in translations files
 			// labelDataRequest.innerHTML = this.translate("TITLE");
 
+			let tileTable = document.createElement("table");
+			let tileHeaderRow = document.createElement("tr");
+			tileHeaderRow.innerHTML = "<td class='bright'>Total Self Staked</td><td class='bright'>Total Staked</td>";
+			tileTable.appendChild(tileHeaderRow);
 
-			wrapper.appendChild(this.createTiles("Total Self Staked", "casper_validator_self_staked_amount"));
-			// wrapper.appendChild(document.createElement("hr"));
-			wrapper.appendChild(this.createTiles("Total Staked", "casper_validator_total_staked_amount"));
+			let tileDataRow = document.createElement("tr");
+			tileDataRow.className = "tiles";
+			tileDataRow.appendChild(this.createTiles("casper_validator_self_staked_amount"));
+			tileDataRow.appendChild(this.createTiles("casper_validator_total_staked_amount"));
+
+			tileTable.appendChild(tileDataRow);
+			wrapper.appendChild(tileTable);
 			wrapper.appendChild(this.activeStatusPanel());
 			wrapper.appendChild(this.upgradeStatusPanel());
 		}
 
 		if (this.rewardDataRequest) {
-			let rewardsHeader = document.createElement("header");
-			rewardsHeader.className = "module-header";
-			rewardsHeader.innerHTML = "Recent Rewards";
-
-			wrapper.appendChild(rewardsHeader);
+			wrapper.appendChild(document.createElement("hr"));
 
 			let rewardTable = document.createElement("table");
 			rewardTable.className = "small";
 
 			this.parseRewardResults(this.rewardDataRequest).forEach(element => {
 				let trElement = document.createElement("tr");
-				trElement.innerHTML = `<td class="symbol align-right "><span class="fa fa-fw fa-donate"></span></td><td class="title bright ">ERA - ${element.era_id}</td><td class="time light bright">${this.formatedCurrency(element.amount, false, true)}</td>`;
+				trElement.innerHTML = `<td class="symbol align-right "><span class="fa fa-fw fa-donate"></span></td><td class="title light bright ">ERA - ${element.era_id}</td><td class="time bright era-amount">${this.formatedCurrency(element.amount, false, true)}</td>`;
 				rewardTable.appendChild(trElement);
 			});
 
