@@ -171,12 +171,13 @@ Module.register("MMM-CasperValidator", {
 		let status = this.getLatestSerieValue("casper_validator_is_active", false, false);
 
 		let valueElement = document.createElement("div");
+		valueElement.className = "value light align-center";
 
 		if (status == "1") {
-			valueElement.className = "value green light";
+			valueElement.className += " green";
 			valueElement.innerHTML = "☘️ ACTIVE VALIDATOR ☘️";
 		} else {
-			valueElement.className = "value red light";
+			valueElement.className += " red";
 			valueElement.innerHTML = "☠️ NOT VALIDATOR ☠️";
 		}
 
@@ -190,12 +191,13 @@ Module.register("MMM-CasperValidator", {
 		let status = this.getLatestSerieValue("casper_validator_should_be_upgraded", false, false);
 
 		let valueElement = document.createElement("div");
+		valueElement.className = "value light align-center";
 
 		if (status == "0") {
-			valueElement.className = "value green light";
+			valueElement.className += " green";
 			valueElement.innerHTML = "✯ LATEST VERSION ✯";
 		} else {
-			valueElement.className = "value red light";
+			valueElement.className += " red";
 			valueElement.innerHTML = "☠️ UPGRADE ☠️";
 		}
 
