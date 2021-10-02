@@ -158,7 +158,7 @@ Module.register("MMM-CasperValidator", {
 		trunc = (typeof trunc !== 'undefined') ? trunc : true;
 
 		let valueElement = document.createElement("td");
-		valueElement.className = "value number large xlarge align-center";
+		valueElement.className = "value number large align-center";
 		valueElement.innerHTML = this.getLatestSerieValue(field_name, trunc);
 
 		return valueElement;

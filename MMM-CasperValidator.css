@@ -12,12 +12,11 @@
  .MMM-CasperValidator .align-center { text-align: center; }
  .MMM-CasperValidator .tiles .value {
   font-size: 1.5rem;
-  font-family: var(--font-primary), sans-serif;
   font-weight: 400;
 }
 
 .MMM-CasperValidator .tiles .value.large {
-  font-size: 2.5rem!important;
+  font-size: 50px!important;
 }
 
 .MMM-CasperValidator .padding-td { width: 2rem; }
