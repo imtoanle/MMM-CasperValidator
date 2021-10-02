@@ -158,7 +158,7 @@ Module.register("MMM-CasperValidator", {
 		trunc = (typeof trunc !== 'undefined') ? trunc : true;
 
 		let valueElement = document.createElement("td");
-		valueElement.className = "value number large xlarge";
+		valueElement.className = "value number large xlarge align-center";
 		valueElement.innerHTML = this.getLatestSerieValue(field_name, trunc);
 
 		return valueElement;
@@ -230,7 +230,7 @@ Module.register("MMM-CasperValidator", {
 
 			let tileTable = document.createElement("table");
 			let tileHeaderRow = document.createElement("tr");
-			tileHeaderRow.innerHTML = "<td class='bright'>Total Self Staked</td><td></td><td class='bright'>Total Staked</td>";
+			tileHeaderRow.innerHTML = "<td class='bright align-center'>Total Self Staked</td><td></td><td class='bright align-center'>Total Staked</td>";
 			tileTable.appendChild(tileHeaderRow);
 
 			let tileDataRow = document.createElement("tr");
