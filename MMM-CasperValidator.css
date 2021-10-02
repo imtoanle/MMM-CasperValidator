@@ -19,7 +19,7 @@
   font-size: 2.5rem!important;
 }
 
-.MMM-CasperValidator .font-medium { font-size: 1rem; }
+.MMM-CasperValidator .font-medium { font-size: 1.5rem; }
 
 .MMM-CasperValidator .tiles .value.number { color: yellow; font-weight: bold; }
 .MMM-CasperValidator .tiles .value.green { color: greenyellow; }
