@@ -173,10 +173,10 @@ Module.register("MMM-CasperValidator", {
 		let valueElement = document.createElement("div");
 
 		if (status == "1") {
-			valueElement.className = "value green";
+			valueElement.className = "value green light";
 			valueElement.innerHTML = "☘️ ACTIVE VALIDATOR ☘️";
 		} else {
-			valueElement.className = "value red";
+			valueElement.className = "value red light";
 			valueElement.innerHTML = "☠️ NOT VALIDATOR ☠️";
 		}
 
@@ -192,10 +192,10 @@ Module.register("MMM-CasperValidator", {
 		let valueElement = document.createElement("div");
 
 		if (status == "0") {
-			valueElement.className = "value green";
+			valueElement.className = "value green light";
 			valueElement.innerHTML = "✯ LATEST VERSION ✯";
 		} else {
-			valueElement.className = "value red";
+			valueElement.className = "value red light";
 			valueElement.innerHTML = "☠️ UPGRADE ☠️";
 		}
 
@@ -230,12 +230,15 @@ Module.register("MMM-CasperValidator", {
 
 			let tileTable = document.createElement("table");
 			let tileHeaderRow = document.createElement("tr");
-			tileHeaderRow.innerHTML = "<td class='bright'>Total Self Staked</td><td class='bright'>Total Staked</td>";
+			tileHeaderRow.innerHTML = "<td class='bright'>Total Self Staked</td><td></td><td class='bright'>Total Staked</td>";
 			tileTable.appendChild(tileHeaderRow);
 
 			let tileDataRow = document.createElement("tr");
 			tileDataRow.className = "tiles";
 			tileDataRow.appendChild(this.createTiles("casper_validator_self_staked_amount"));
+			let paddingTd = document.createElement("td");
+			paddingTd.className = "padding-td";
+			tileDataRow.appendChild(paddingTd);
 			tileDataRow.appendChild(this.createTiles("casper_validator_total_staked_amount"));
 			tileTable.appendChild(tileDataRow);
 			wrapper.appendChild(tileTable);
@@ -253,7 +256,7 @@ Module.register("MMM-CasperValidator", {
 
 			this.parseRewardResults(this.rewardDataRequest).forEach(element => {
 				let trElement = document.createElement("tr");
-				trElement.innerHTML = `<td class="symbol align-right "><span class="fa fa-fw fa-donate"></span></td><td class="title bright font-medium">ERA - ${element.era_id}</td><td class="time bright font-medium">${this.formatedCurrency(element.amount, false, true)}</td>`;
+				trElement.innerHTML = `<td class="symbol align-right "><span class="fa fa-fw fa-donate font-medium bright"></span></td><td class="title bright font-medium">ERA - ${element.era_id}</td><td class="time bright font-medium">${this.formatedCurrency(element.amount, false, true)}</td>`;
 				rewardTable.appendChild(trElement);
 			});
 

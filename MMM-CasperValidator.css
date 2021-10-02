@@ -11,7 +11,7 @@
 
  .MMM-CasperValidator .tiles label { }
  .MMM-CasperValidator .tiles .value {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-family: var(--font-secondary), sans-serif;
 }
 
@@ -19,6 +19,7 @@
   font-size: 2.5rem!important;
 }
 
+.MMM-CasperValidator .padding-td { width: 2rem; }
 .MMM-CasperValidator .font-medium { font-size: 1.5rem; }
 
 .MMM-CasperValidator .tiles .value.number { color: yellow; font-weight: bold; }
