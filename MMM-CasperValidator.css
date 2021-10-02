@@ -10,11 +10,10 @@
  */
 
  .MMM-CasperValidator .align-center { text-align: center; }
- .MMM-CasperValidator .tiles label { }
  .MMM-CasperValidator .tiles .value {
   font-size: 1.5rem;
-  font-family: var(--font-secondary), sans-serif;
-  text-align: center;
+  font-family: var(--font-primary), sans-serif;
+  font-weight: 400;
 }
 
 .MMM-CasperValidator .tiles .value.large {
@@ -25,5 +24,5 @@
 .MMM-CasperValidator .font-medium { font-size: 1.5rem; }
 
 .MMM-CasperValidator .tiles .value.number { color: yellow; font-weight: bold; }
-.MMM-CasperValidator .tiles .value.green { color: greenyellow; }
+.MMM-CasperValidator .tiles .value.green { color: #A3EA80; }
 .MMM-CasperValidator .tiles .value.red { color: red; }
