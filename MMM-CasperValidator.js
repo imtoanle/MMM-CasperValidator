@@ -158,7 +158,7 @@ Module.register("MMM-CasperValidator", {
 		trunc = (typeof trunc !== 'undefined') ? trunc : true;
 
 		let valueElement = document.createElement("td");
-		valueElement.className = "value number large";
+		valueElement.className = "value number large xlarge";
 		valueElement.innerHTML = this.getLatestSerieValue(field_name, trunc);
 
 		return valueElement;
@@ -237,9 +237,10 @@ Module.register("MMM-CasperValidator", {
 			tileDataRow.className = "tiles";
 			tileDataRow.appendChild(this.createTiles("casper_validator_self_staked_amount"));
 			tileDataRow.appendChild(this.createTiles("casper_validator_total_staked_amount"));
-
 			tileTable.appendChild(tileDataRow);
 			wrapper.appendChild(tileTable);
+
+			wrapper.appendChild(document.createElement("hr"));
 			wrapper.appendChild(this.activeStatusPanel());
 			wrapper.appendChild(this.upgradeStatusPanel());
 		}
@@ -252,7 +253,7 @@ Module.register("MMM-CasperValidator", {
 
 			this.parseRewardResults(this.rewardDataRequest).forEach(element => {
 				let trElement = document.createElement("tr");
-				trElement.innerHTML = `<td class="symbol align-right "><span class="fa fa-fw fa-donate"></span></td><td class="title light bright ">ERA - ${element.era_id}</td><td class="time bright era-amount">${this.formatedCurrency(element.amount, false, true)}</td>`;
+				trElement.innerHTML = `<td class="symbol align-right "><span class="fa fa-fw fa-donate"></span></td><td class="title bright font-medium">ERA - ${element.era_id}</td><td class="time bright font-medium">${this.formatedCurrency(element.amount, false, true)}</td>`;
 				rewardTable.appendChild(trElement);
 			});
 

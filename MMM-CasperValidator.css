@@ -11,15 +11,16 @@
 
  .MMM-CasperValidator .tiles label { }
  .MMM-CasperValidator .tiles .value {
-  font-size: 40px;
+  font-size: 2rem;
+  font-family: var(--font-secondary), sans-serif;
 }
 
 .MMM-CasperValidator .tiles .value.large {
-  font-size: 40px;
+  font-size: 2.5rem!important;
 }
 
-.MMM-CasperValidator .era-amount { font-size: 25px; }
+.MMM-CasperValidator .font-medium { font-size: 1rem; }
 
-.MMM-CasperValidator .tiles .value.number { color: lightskyblue; font-weight: bold; }
+.MMM-CasperValidator .tiles .value.number { color: yellow; font-weight: bold; }
 .MMM-CasperValidator .tiles .value.green { color: greenyellow; }
 .MMM-CasperValidator .tiles .value.red { color: red; }
