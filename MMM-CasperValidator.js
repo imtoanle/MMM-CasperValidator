@@ -25,6 +25,7 @@ Module.register("MMM-CasperValidator", {
 
 		//Flag for check if module is loaded
 		this.loaded = false;
+		this.loadingFailed = false;
 
 		// Schedule update timer.
 		this.getData();
@@ -70,8 +71,11 @@ Module.register("MMM-CasperValidator", {
 		rewardDataRequest.onreadystatechange = function() {
 			if (this.readyState === 4) {
 				if (this.status === 200) {
+					self.loadingFailed = false;
 					self.rewardDataRequest = JSON.parse(this.response);
 				} else {
+					self.loadingFailed = true;
+					self.updateDom(self.config.animationSpeed);
 					Log.error(self.name, "Could not load data.");
 				}
 			}
@@ -85,12 +89,15 @@ Module.register("MMM-CasperValidator", {
 			if (this.readyState === 4) {
 				console.log(this.status);
 				if (this.status === 200) {
+					self.loadingFailed = false;
 					self.processData(JSON.parse(this.response));
 				} else if (this.status === 401) {
 					self.updateDom(self.config.animationSpeed);
 					Log.error(self.name, this.status);
 					retry = false;
 				} else {
+					self.loadingFailed = true;
+					self.updateDom(self.config.animationSpeed);
 					Log.error(self.name, "Could not load data.");
 				}
 				if (retry) {
@@ -173,7 +180,10 @@ Module.register("MMM-CasperValidator", {
 		let valueElement = document.createElement("div");
 		valueElement.className = "value light align-center";
 
-		if (status == "1") {
+		if (this.loadingFailed) {
+			valueElement.className += " red";
+			valueElement.innerHTML = "☠️ INTERNET FAILED ☠️";
+		} else if (status == "1") {
 			valueElement.className += " green";
 			valueElement.innerHTML = "☘️ ACTIVE VALIDATOR ☘️";
 		} else {
@@ -213,7 +223,7 @@ Module.register("MMM-CasperValidator", {
 		let results = [];
 		
 		json.data.result.forEach(element => {
-			results.push({era_id: element.metric.era_id, amount: element.values[0][1]});
+			results.push({era_id: element.metric.era_id, amount: element.values[0][1], time: new Date(element.values[0][0] * 1000)});
 		});
 
 		return results.reverse();
@@ -258,7 +268,7 @@ Module.register("MMM-CasperValidator", {
 
 			this.parseRewardResults(this.rewardDataRequest).forEach(element => {
 				let trElement = document.createElement("tr");
-				trElement.innerHTML = `<td class="symbol align-right "><span class="fa fa-fw fa-donate font-medium bright"></span></td><td class="title bright font-medium">ERA - ${element.era_id}</td><td class="time bright font-medium">${this.formatedCurrency(element.amount, false, true)}</td>`;
+				trElement.innerHTML = `<td class="symbol align-right font-medium bright"><span class="fa fa-fw fa-donate"></span> ${element.era_id}</td><td class="title bright font-medium">${element.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</td><td class="time bright font-medium">${this.formatedCurrency(element.amount, false, true)}</td>`;
 				rewardTable.appendChild(trElement);
 			});
 
