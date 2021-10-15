@@ -12,7 +12,8 @@ Module.register("MMM-CasperValidator", {
 		api_url: '',
 		prometheus_job: '',
 		updateInterval: 60000,
-		retryDelay: 5000
+		retryDelay: 5000,
+		validatorAddress: ''
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -21,7 +22,7 @@ Module.register("MMM-CasperValidator", {
 		var self = this;
 		var dataRequest = null;
 		var rewardDataRequest = null;
-		var dataNotification = null;
+		var nodeStatus = null;
 
 		//Flag for check if module is loaded
 		this.loaded = false;
@@ -66,28 +67,13 @@ Module.register("MMM-CasperValidator", {
 
 		var retry = true;
 
-		var rewardDataRequest = new XMLHttpRequest();
-		rewardDataRequest.open("GET", rewardUrlApi, true);
-		rewardDataRequest.onreadystatechange = function() {
-			if (this.readyState === 4) {
-				if (this.status === 200) {
-					self.loadingFailed = false;
-					self.rewardDataRequest = JSON.parse(this.response);
-				} else {
-					self.loadingFailed = true;
-					self.updateDom(self.config.animationSpeed);
-					Log.error(self.name, "Could not load data.");
-				}
-			}
-		};
-		rewardDataRequest.send();
+		this.getRewardsData(self);
+		// this.getCasperOfficialRPC();
 
 		var dataRequest = new XMLHttpRequest();
 		dataRequest.open("GET", urlApi, true);
 		dataRequest.onreadystatechange = function() {
-			console.log(this.readyState);
 			if (this.readyState === 4) {
-				console.log(this.status);
 				if (this.status === 200) {
 					self.loadingFailed = false;
 					self.processData(JSON.parse(this.response));
@@ -108,40 +94,59 @@ Module.register("MMM-CasperValidator", {
 		dataRequest.send();
 	},
 
-	// getRewardsData: function() {
-	// 	var self = this;
+	getCasperOfficialRPC: function() {
+		var self = this;
+		let request = new XMLHttpRequest();
+		let params = JSON.stringify({
+			id: "0",
+			jsonrpc: "2.0",
+			method: "info_get_status"
+		});
 
-		// var startTime = new Date();
-		// startTime.setHours(startTime.getHours() - 12);
-		// var endTime = new Date();
+		request.open("POST", 'https://node-clarity-mainnet.make.services/rpc', true);
+		request.setRequestHeader("Content-Type", "application/json");
+		request.setRequestHeader("User-Agent", "PostmanRuntime/7.28.4");
+		request.setRequestHeader("Accept", "*/*");
+		request.setRequestHeader("Accept-Encoding", "gzip, deflate, br");
+		request.setRequestHeader("Connection", "keep-alive");
+		
+		request.onreadystatechange = function() {
+			if (this.readyState === 4) {
+				if (this.status === 200) {
+					// self.loadingFailed = false;
+					// self.rewardDataRequest = JSON.parse(this.response);
+					// self.updateDom(self.config.animationSpeed);
+					console.log(this.response);
+				} else {
+					self.loadingFailed = true;
+					self.updateDom(self.config.animationSpeed);
+					Log.error(self.name, "Could not load data.");
+				}
+			}
+		};
+		request.send(params);
+	},
 
-	// 	var params = `query=sum by(era_id)(casper_validator_era_rewards{job="${this.config.prometheus_job}"})&start=${startTime.toISOString()}&end=${endTime.toISOString()}&step=7200`;
-	// 	var urlApi = `${this.config.api_url}/api/v1/query_range?${params}`;
-	// 	var retry = true;
-
-	// 	var dataRequest = new XMLHttpRequest();
-	// 	dataRequest.open("GET", urlApi, true);
-	// 	dataRequest.onreadystatechange = function() {
-	// 		console.log(this.readyState);
-	// 		if (this.readyState === 4) {
-	// 			console.log(this.status);
-	// 			if (this.status === 200) {
-	// 				self.processData(JSON.parse(this.response));
-	// 			} else if (this.status === 401) {
-	// 				self.updateDom(self.config.animationSpeed);
-	// 				Log.error(self.name, this.status);
-	// 				retry = false;
-	// 			} else {
-	// 				Log.error(self.name, "Could not load data.");
-	// 			}
-	// 			if (retry) {
-	// 				self.scheduleUpdate((self.loaded) ? -1 : self.config.retryDelay);
-	// 			}
-	// 		}
-	// 	};
-	// 	dataRequest.send();
-	// },
-
+	getRewardsData: function() {
+		var self = this;
+		let request = new XMLHttpRequest();
+		let rewardUrlApi = `https://event-store-api-clarity-mainnet.make.services/validators/${this.config.validatorAddress}/rewards?with_amounts_in_currency_id=1&page=1&limit=4&order_direction=DESC`;
+		request.open("GET", rewardUrlApi, true);
+		request.onreadystatechange = function() {
+			if (this.readyState === 4) {
+				if (this.status === 200) {
+					self.loadingFailed = false;
+					self.rewardDataRequest = JSON.parse(this.response);
+					self.updateDom(self.config.animationSpeed);
+				} else {
+					self.loadingFailed = true;
+					self.updateDom(self.config.animationSpeed);
+					Log.error(self.name, "Could not load data.");
+				}
+			}
+		};
+		request.send();
+	},
 
 	/* scheduleUpdate()
 	 * Schedule next update.
@@ -169,6 +174,34 @@ Module.register("MMM-CasperValidator", {
 		valueElement.innerHTML = this.getLatestSerieValue(field_name, trunc);
 
 		return valueElement;
+	},
+
+	compareNodes: function(data) {
+		let tileTable = document.createElement("table");
+		tileTable.className = "tiles";
+		tileTable.innerHTML = `
+			<tr>
+				<td></td>
+				<td class='bright'>Our Node</td>
+				<td class='bright'>Their Node</td>
+			</tr>
+			<tr>
+				<td>ERA</td>
+				<td class="${this.compareCssClass(data.ourNode.era_id, data.theirNode.era_id)}">${data.ourNode.era_id}</td>
+				<td class="green">${data.theirNode.era_id}</td>
+			</tr>
+			<tr>
+				<td>Height</td>
+				<td class="${this.compareCssClass(data.ourNode.height, data.theirNode.height)}">${data.ourNode.height}</td>
+				<td class="green">${data.theirNode.height}</td>
+			</tr>
+		`;
+		
+		return tileTable;
+	},
+
+	compareCssClass: function(a, b) {
+		return (a == b) ? "green" : "red";
 	},
 
 	activeStatusPanel: function() {
@@ -222,11 +255,11 @@ Module.register("MMM-CasperValidator", {
 	parseRewardResults: function(json) {
 		let results = [];
 		
-		json.data.result.forEach(element => {
-			results.push({era_id: element.metric.era_id, amount: element.values[0][1], time: new Date(element.values[0][0] * 1000)});
+		json.data.forEach(element => {
+			results.push({era_id: element.eraId, amount: element.amount / 1000000000, time: new Date(element.timestamp)});
 		});
 
-		return results.reverse();
+		return results;
 	},
 	getDom: function() {
 		var self = this;
@@ -235,11 +268,6 @@ Module.register("MMM-CasperValidator", {
 		var wrapper = document.createElement("div");
 		// If this.dataRequest is not empty
 		if (this.dataRequest) {
-			// var labelDataRequest = document.createElement("label");
-			// // Use translate function
-			// //             this id defined in translations files
-			// labelDataRequest.innerHTML = this.translate("TITLE");
-
 			let tileTable = document.createElement("table");
 			let tileHeaderRow = document.createElement("tr");
 			tileHeaderRow.innerHTML = "<td class='bright align-center'>Total Self Staked</td><td></td><td class='bright align-center'>Total Staked</td>";
@@ -254,6 +282,11 @@ Module.register("MMM-CasperValidator", {
 			tileDataRow.appendChild(this.createTiles("casper_validator_total_staked_amount"));
 			tileTable.appendChild(tileDataRow);
 			wrapper.appendChild(tileTable);
+
+			if (this.nodeStatus) {
+				wrapper.appendChild(document.createElement("hr"));
+				wrapper.appendChild(this.compareNodes(this.nodeStatus));
+			}
 
 			wrapper.appendChild(document.createElement("hr"));
 			wrapper.appendChild(this.activeStatusPanel());
@@ -275,14 +308,6 @@ Module.register("MMM-CasperValidator", {
 			wrapper.appendChild(rewardTable);
 		}
 
-		// Data from helper
-		// if (this.dataNotification) {
-		// 	var wrapperDataNotification = document.createElement("div");
-		// 	// translations  + datanotification
-		// 	wrapperDataNotification.innerHTML =  this.translate("UPDATE") + ": " + this.dataNotification.date;
-
-		// 	wrapper.appendChild(wrapperDataNotification);
-		// }
 		return wrapper;
 	},
 
@@ -313,14 +338,13 @@ Module.register("MMM-CasperValidator", {
 
 		// the data if load
 		// send notification to helper
-		this.sendSocketNotification("MMM-CasperValidator-NOTIFICATION_TEST", data);
+		this.sendSocketNotification("MMM-CasperValidator-COMPARE_NODES", { theirNode: this.config.theirNode, ourNode: this.config.ourNode });
 	},
 
 	// socketNotificationReceived from helper
 	socketNotificationReceived: function (notification, payload) {
-		if(notification === "MMM-CasperValidator-NOTIFICATION_TEST") {
-			// set dataNotification
-			this.dataNotification = payload;
+		if(notification === "MMM-CasperValidator-COMPARE_NODES") {
+			this.nodeStatus = payload;
 			this.updateDom();
 		}
 	},

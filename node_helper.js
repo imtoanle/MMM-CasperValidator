@@ -6,6 +6,8 @@
  */
 
 var NodeHelper = require("node_helper");
+const axios = require('axios');
+
 
 module.exports = NodeHelper.create({
 
@@ -18,30 +20,40 @@ module.exports = NodeHelper.create({
 	 * argument payload mixed - The payload of the notification.
 	 */
 	socketNotificationReceived: function(notification, payload) {
-		if (notification === "MMM-CasperValidator-NOTIFICATION_TEST") {
-			// console.log("Working notification system. Notification:", notification, "payload: ", payload);
-			// Send notification
-			this.sendNotificationTest(this.anotherFunction()); //Is possible send objects :)
+		if (notification === "MMM-CasperValidator-OFFICIAL_RPC") {
+			this.getCasperRPC(notification, 'https://node-clarity-mainnet.make.services/rpc');
+		} else if (notification === "MMM-CasperValidator-COMPARE_NODES") {
+			// this.getCasperRPC(notification, payload.ourNode);
+			this.compareBothNodes(payload);
 		}
 	},
 
-	// Example function send notification test
-	sendNotificationTest: function(payload) {
-		this.sendSocketNotification("MMM-CasperValidator-NOTIFICATION_TEST", payload);
-	},
+	compareBothNodes: async function(payload) {
+		let theirNode = await this.getCasperRPC(payload.theirNode);
+		let ourNode = await this.getCasperRPC(payload.ourNode);
 
-	// this you can create extra routes for your module
-	extraRoutes: function() {
-		var self = this;
-		this.expressApp.get("/MMM-CasperValidator/extra_route", function(req, res) {
-			// call another function
-			values = self.anotherFunction();
-			res.send(values);
+		this.sendSocketNotification("MMM-CasperValidator-COMPARE_NODES", {
+			theirNode: theirNode,
+			ourNode: ourNode
 		});
 	},
+	getCasperRPC: function(url) {
+		var self = this;
 
-	// Test another function
-	anotherFunction: function() {
-		return {date: new Date()};
+		return axios.post(url, {
+			id: "0",
+			jsonrpc: "2.0",
+			method: "info_get_status"
+		})
+		.then( res => self.parseRPCData(res.data) )
+		.catch( error => console.log(error) );
+	},
+
+	parseRPCData: function(data) {
+		return {
+			era_id: data.result.last_added_block_info.era_id,
+			height: data.result.last_added_block_info.height,
+			next_upgrade: data.result.next_upgrade
+		}
 	}
 });
