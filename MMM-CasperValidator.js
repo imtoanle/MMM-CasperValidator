@@ -187,13 +187,13 @@ Module.register("MMM-CasperValidator", {
 			</tr>
 			<tr>
 				<td>ERA</td>
-				<td class="${this.compareCssClass(data.ourNode.era_id, data.theirNode.era_id)}">${data.ourNode.era_id}</td>
-				<td class="green">${data.theirNode.era_id}</td>
+				<td class="value ${this.compareCssClass(data.ourNode.era_id, data.theirNode.era_id)}">${data.ourNode.era_id}</td>
+				<td class="value green">${data.theirNode.era_id}</td>
 			</tr>
 			<tr>
 				<td>Height</td>
-				<td class="${this.compareCssClass(data.ourNode.height, data.theirNode.height)}">${data.ourNode.height}</td>
-				<td class="green">${data.theirNode.height}</td>
+				<td class="value ${this.compareCssClass(data.ourNode.height, data.theirNode.height)}">${data.ourNode.height}</td>
+				<td class="value green">${data.theirNode.height}</td>
 			</tr>
 		`;
 		
