@@ -181,11 +181,6 @@ Module.register("MMM-CasperValidator", {
 		tileTable.className = "tiles";
 		tileTable.innerHTML = `
 			<tr>
-				<td></td>
-				<td class='bright'>Our Node</td>
-				<td class='bright'>Their Node</td>
-			</tr>
-			<tr>
 				<td>ERA</td>
 				<td class="value ${this.compareCssClass(data.ourNode.era_id, data.theirNode.era_id)}">${data.ourNode.era_id}</td>
 				<td class="value green">${data.theirNode.era_id}</td>
