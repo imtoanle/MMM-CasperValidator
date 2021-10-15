@@ -20,10 +20,7 @@ module.exports = NodeHelper.create({
 	 * argument payload mixed - The payload of the notification.
 	 */
 	socketNotificationReceived: function(notification, payload) {
-		if (notification === "MMM-CasperValidator-OFFICIAL_RPC") {
-			this.getCasperRPC(notification, 'https://node-clarity-mainnet.make.services/rpc');
-		} else if (notification === "MMM-CasperValidator-COMPARE_NODES") {
-			// this.getCasperRPC(notification, payload.ourNode);
+		if (notification === "MMM-CasperValidator-COMPARE_NODES") {
 			this.compareBothNodes(payload);
 		}
 	},
@@ -45,8 +42,8 @@ module.exports = NodeHelper.create({
 			jsonrpc: "2.0",
 			method: "info_get_status"
 		})
-		.then( res => self.parseRPCData(res.data) )
-		.catch( error => console.log(error) );
+		.then(res => self.parseRPCData(res.data))
+		.catch(error => { return { era_id: 0, height: 0, next_upgrade: null } });
 	},
 
 	parseRPCData: function(data) {
