@@ -9,8 +9,6 @@
 
 Module.register("MMM-CasperValidator", {
 	defaults: {
-		api_url: '',
-		prometheus_job: '',
 		updateInterval: 60000,
 		retryDelay: 5000,
 		validatorAddress: ''
@@ -24,8 +22,8 @@ Module.register("MMM-CasperValidator", {
 		this.stakedInfo = {selfStaked: 0, totalStaked: 0, active: false};
 		this.rewardDataRequest = null;
 		this.nodeStatus = {
-			theirNode: { era_id: 0, height: 0 },
-			ourNode: { era_id: 0, height: 0 }
+			theirNode: { era_id: 0, height: 0, next_upgrade: false },
+			ourNode: { era_id: 0, height: 0, next_upgrade: null }
 		};
 
 		//Flag for check if module is loaded
@@ -89,6 +87,10 @@ Module.register("MMM-CasperValidator", {
 				<td>Node Status</td>
 				<td class="value ${this.compareCssClass(this.isActiveNode(), true)}" colspan="2">${this.isActiveNodeLabel()}</td>
 			</tr>
+			<tr>
+				<td>Upgrade Status</td>
+				<td class="value ${this.compareCssClass(this.needUpgradeNode(), false)}" colspan="2">${this.needUpgradeNodeLabel()}</td>
+			</tr>
 		`;
 		
 		return tileTable;
@@ -101,25 +103,9 @@ Module.register("MMM-CasperValidator", {
 	isActiveNodeLabel: function() {
 		return this.isActiveNode() ? "☘️ ACTIVE VALIDATOR ☘️" : "☠️ NOT VALIDATOR ☠️";
 	},
-	upgradeStatusPanel: function() {
-		let tileElement = document.createElement("div");
-		tileElement.className = "tiles";
 
-		let status = this.getLatestSerieValue("casper_validator_should_be_upgraded", false, false);
-
-		let valueElement = document.createElement("div");
-		valueElement.className = "value light align-center";
-
-		if (status == "0") {
-			valueElement.className += " green";
-			valueElement.innerHTML = "✯ LATEST VERSION ✯";
-		} else {
-			valueElement.className += " red";
-			valueElement.innerHTML = "☠️ UPGRADE ☠️";
-		}
-
-		tileElement.appendChild(valueElement);
-		return tileElement;
+	needUpgradeNodeLabel: function() {
+		return this.needUpgradeNode() ? "☠️ NEED UPGRADE ☠️" : "✯ LATEST VERSION ✯";
 	},
 
 	parseRewardResults: function(json) {
@@ -134,6 +120,9 @@ Module.register("MMM-CasperValidator", {
 
 	isActiveNode: function() {
 		return this.nodeStatus.ourNode.era_id > 0 && this.rewardDataRequest && this.rewardDataRequest.data[0].amount > 0 && this.stakedInfo.active
+	},
+	needUpgradeNode: function() {
+		return this.nodeStatus.ourNode.next_upgrade !== this.nodeStatus.theirNode.next_upgrade
 	},
 	getDom: function() {
 		var self = this;
@@ -157,8 +146,6 @@ Module.register("MMM-CasperValidator", {
 
 		wrapper.appendChild(document.createElement("hr"));
 		wrapper.appendChild(this.compareNodes());
-
-		// wrapper.appendChild(this.upgradeStatusPanel());
 
 		if (this.rewardDataRequest) {
 			wrapper.appendChild(document.createElement("hr"));
@@ -214,7 +201,6 @@ Module.register("MMM-CasperValidator", {
 				break;
 			case "MMM-CasperValidator-STAKED_INFO":
 				this.stakedInfo = payload;
-				console.log(payload);
 				this.updateDom();
 				break;
 		}
