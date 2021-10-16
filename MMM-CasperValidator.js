@@ -34,7 +34,6 @@ Module.register("MMM-CasperValidator", {
 		this.requestUpdate();
 		setInterval(function() {
 			self.requestUpdate();
-			self.updateDom();
 		}, this.config.updateInterval);
 	},
 
