@@ -118,7 +118,11 @@ Module.register("MMM-CasperValidator", {
 	},
 
 	isActiveNode: function() {
-		return this.nodeStatus.ourNode.era_id > 0 && this.rewardDataRequest && this.rewardDataRequest.data[0].amount > 0 && this.stakedInfo.active
+		let lastReward = this.rewardDataRequest && this.rewardDataRequest.data[0];
+
+		return this.nodeStatus.ourNode.era_id > 0 && 
+			lastReward && lastReward.amount > 0 && (new Date - new Date(lastReward.timestamp)) <= 2*3600*1000 &&
+			this.stakedInfo.active
 	},
 	needUpgradeNode: function() {
 		return this.nodeStatus.ourNode.next_upgrade !== this.nodeStatus.theirNode.next_upgrade
