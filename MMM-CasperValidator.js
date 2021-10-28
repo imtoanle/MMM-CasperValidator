@@ -125,7 +125,10 @@ Module.register("MMM-CasperValidator", {
 			this.stakedInfo.active
 	},
 	needUpgradeNode: function() {
-		return this.nodeStatus.ourNode.next_upgrade !== this.nodeStatus.theirNode.next_upgrade
+		let nextTheirNodeVersion = this.nodeStatus.theirNode.next_upgrade && this.nodeStatus.theirNode.next_upgrade.protocol_version;
+		let nextOurNodeVersion = this.nodeStatus.ourNode.next_upgrade && this.nodeStatus.ourNode.next_upgrade.protocol_version;
+
+		return nextTheirNodeVersion != nextOurNodeVersion;
 	},
 	getDom: function() {
 		var self = this;
