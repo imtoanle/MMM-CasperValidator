@@ -121,7 +121,7 @@ Module.register("MMM-CasperValidator", {
 		let lastReward = this.rewardDataRequest && this.rewardDataRequest.data[0];
 
 		return this.nodeStatus.ourNode.era_id > 0 && 
-			lastReward && lastReward.amount > 0 && (new Date - new Date(lastReward.timestamp)) <= 2*3600*1000 &&
+			lastReward && lastReward.amount > 0 && (new Date - new Date(lastReward.timestamp)) <= 2.2*3600*1000 &&
 			this.stakedInfo.active
 	},
 	needUpgradeNode: function() {
