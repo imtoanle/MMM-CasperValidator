@@ -37,7 +37,7 @@ module.exports = NodeHelper.create({
 
 	sendStakedInfo: async function(payload) {
 		let auctionInfo = await this.requestAuctionInfo(payload);
-		let bidData = auctionInfo.auction_state.bids.filter((obj) => obj.public_key == payload.validatorAddress)[0];
+		let bidData = auctionInfo.auction_state.bids.filter((obj) => obj.public_key.toLowerCase() == payload.validatorAddress.toLowerCase())[0];
 		let selfStakedAmount = this.convertToCSPR(bidData.bid.staked_amount);
 		let delegatorStakedAmount = bidData.bid.delegators.map(a => this.convertToCSPR(a.staked_amount)).reduce((a, b) => a + b, 0);
 
