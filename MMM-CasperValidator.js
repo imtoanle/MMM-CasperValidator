@@ -181,7 +181,7 @@ Module.register("MMM-CasperValidator", {
 		let tileTable = document.createElement("table");
 		tileTable.innerHTML = `
 			<tr>
-				<td colspan="3" class='bright align-center'>${this.config.nodeName} - ${this.middleTruncate(this.config.validatorAddress, 50)}</td>
+				<td colspan="3" class='bright align-center'>${this.config.nodeName} - ${this.middleTruncate(this.config.validatorAddress, 42)}</td>
 			</tr>
 			<tr>
 				<td class='bright align-center'>Total Self Staked</td>
