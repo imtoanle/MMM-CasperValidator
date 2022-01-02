@@ -129,6 +129,22 @@ Module.register("MMM-CasperValidator", {
 
 		return nextTheirNodeVersion != nextOurNodeVersion;
 	},
+
+	middleTruncate: function (fullStr, strLen, separator) {
+    if (fullStr.length <= strLen) return fullStr;
+
+    separator = separator || '...';
+
+    var sepLen = separator.length,
+        charsToShow = strLen - sepLen,
+        frontChars = Math.ceil(charsToShow/2),
+        backChars = Math.floor(charsToShow/2);
+
+    return fullStr.substr(0, frontChars) + 
+           separator + 
+           fullStr.substr(fullStr.length - backChars);
+	},
+
 	getDom: function() {
 		var self = this;
 
@@ -137,7 +153,7 @@ Module.register("MMM-CasperValidator", {
 		let tileTable = document.createElement("table");
 		tileTable.innerHTML = `
 			<tr>
-				<td colspan="3" class='bright align-center'>${this.config.validatorAddress}</td>
+				<td colspan="3" class='bright align-center'>${this.middleTruncate(this.config.validatorAddress, 33)}</td>
 			</tr>
 			<tr>
 				<td class='bright align-center'>Total Self Staked</td>
