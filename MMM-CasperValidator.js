@@ -14,6 +14,7 @@ Module.register("MMM-CasperValidator", {
 		nodeName: '',
 		validatorAddress: '',
 		performanceApi: '',
+		chain: 'mainnet',
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -21,6 +22,10 @@ Module.register("MMM-CasperValidator", {
 	start: function() {
 		var self = this;
 		var dataRequest = null;
+		this.performanceApi = `https://event-store-api-clarity-${this.config.chain}.make.services`;
+		this.theirNode = `https://node-clarity-${this.config.chain}.make.services/rpc`;
+		this.rewardUrl = `https://event-store-api-clarity-${this.config.chain}.make.services`;
+
 		this.stakedInfo = {selfStaked: 0, totalStaked: 0, active: false};
 		this.rewardDataRequest = null;
 		this.nodeStatus = {
@@ -44,11 +49,11 @@ Module.register("MMM-CasperValidator", {
 	},
 
 	requestUpdate: function() {
-		this.sendSocketNotification("MMM-CasperValidator-THEIR_NODE_STATUS", { nodeName: this.config.nodeName, nodeUrl: this.config.theirNode });
+		this.sendSocketNotification("MMM-CasperValidator-THEIR_NODE_STATUS", { nodeName: this.config.nodeName, nodeUrl: this.theirNode });
 		this.sendSocketNotification("MMM-CasperValidator-OUR_NODE_STATUS", { nodeName: this.config.nodeName, nodeUrl: this.config.ourNode });
-		this.sendSocketNotification("MMM-CasperValidator-REWARDS", { nodeName: this.config.nodeName, validatorAddress: this.config.validatorAddress });
-		this.sendSocketNotification("MMM-CasperValidator-GET_AUCTION_INFO", { nodeName: this.config.nodeName, validatorAddress: this.config.validatorAddress, nodeUrl: this.config.theirNode });
-		this.sendSocketNotification("MMM-CasperValidator-GET_PERFORMANCE", { nodeName: this.config.nodeName, validatorAddress: this.config.validatorAddress, performanceApi: this.config.performanceApi, currentEra: this.nodeStatus.theirNode.era_id });
+		this.sendSocketNotification("MMM-CasperValidator-REWARDS", { nodeName: this.config.nodeName, rewardUrl: this.rewardUrl, validatorAddress: this.config.validatorAddress });
+		this.sendSocketNotification("MMM-CasperValidator-GET_AUCTION_INFO", { nodeName: this.config.nodeName, validatorAddress: this.config.validatorAddress, nodeUrl: this.theirNode });
+		this.sendSocketNotification("MMM-CasperValidator-GET_PERFORMANCE", { nodeName: this.config.nodeName, validatorAddress: this.config.validatorAddress, performanceApi: this.performanceApi, currentEra: this.nodeStatus.theirNode.era_id });
 	},
 
 	getLatestSerieValue: function(name, trunc, localeFormat) {
@@ -91,7 +96,7 @@ Module.register("MMM-CasperValidator", {
 			</tr>
 			<tr>
 				<td>Performances</td>
-				<td class="value yellow">${this.performances.lastPerformance.toFixed(4)}%</td>
+				<td class="value yellow">${this.performances.lastPerformance.toFixed(2)}%</td>
 				<td class="value ${this.performanceChangesClass(this.performances.changes24h)}">${this.performanceChangesValue(this.performances.changes24h)}</td>
 			</tr>
 			<tr>
@@ -115,7 +120,7 @@ Module.register("MMM-CasperValidator", {
 	},
 
 	performanceChangesValue: function(changes) {
-		changes = changes.toFixed(4);
+		changes = changes.toFixed(2);
 		if (changes > 0) return `+ ${changes}%`;
 		else if (changes == 0) return `${changes}%`;
 		else return `- ${changes}%`;
@@ -176,7 +181,7 @@ Module.register("MMM-CasperValidator", {
 		let tileTable = document.createElement("table");
 		tileTable.innerHTML = `
 			<tr>
-				<td colspan="3" class='bright align-center'>${this.middleTruncate(this.config.validatorAddress, 33)}</td>
+				<td colspan="3" class='bright align-center'>${this.config.nodeName} - ${this.middleTruncate(this.config.validatorAddress, 30)}</td>
 			</tr>
 			<tr>
 				<td class='bright align-center'>Total Self Staked</td>

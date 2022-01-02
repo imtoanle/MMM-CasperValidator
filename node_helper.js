@@ -111,9 +111,10 @@ module.exports = NodeHelper.create({
 
 	sendRewards: function(notification, payload) {
 		var self = this;
-
-		axios.get(`https://event-store-api-clarity-mainnet.make.services/validators/${payload.validatorAddress}/rewards?with_amounts_in_currency_id=1&page=1&limit=4&order_direction=DESC`)
-		.then(res => self.sendSocketNotification(notification, { nodeName: payload.nodeName, data: res.data }) )
+		axios.get(`${payload.rewardUrl}/validators/${payload.validatorAddress}/rewards?with_amounts_in_currency_id=1&page=1&limit=4&order_direction=DESC`)
+		.then(res => {
+			self.sendSocketNotification(notification, { nodeName: payload.nodeName, data: res.data })
+		} )
 		.catch(error => console.log(error));
 	},
 
