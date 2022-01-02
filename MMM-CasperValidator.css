@@ -11,7 +11,7 @@
 
  .MMM-CasperValidator .align-center { text-align: center; }
  .MMM-CasperValidator .tiles .value {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 400;
 }
 
@@ -20,7 +20,7 @@
 }
 
 .MMM-CasperValidator .padding-td { width: 2rem; }
-.MMM-CasperValidator .font-medium { font-size: 1.5rem; }
+.MMM-CasperValidator .font-medium { font-size: 1.4rem; }
 
 .MMM-CasperValidator .tiles .number { color: yellow; font-weight: bold; }
 .MMM-CasperValidator .tiles .green { color: #A3EA80; }
