@@ -101,10 +101,8 @@ Module.register("MMM-CasperValidator", {
 			</tr>
 			<tr>
 				<td>Node Status</td>
-				<td class="value" colspan="2">
-					<span class="${this.compareCssClass(this.isActiveNode(), true)}">${this.isActiveNodeLabel()}</span> / 
-					<span class="${this.compareCssClass(this.needUpgradeNode(), false)}">${this.needUpgradeNodeLabel()}</span>
-				</td>
+				<td class="value ${this.compareCssClass(this.isActiveNode(), true)}">${this.isActiveNodeLabel()}</td>
+				<td class="value ${this.compareCssClass(this.needUpgradeNode(), false)}">${this.needUpgradeNodeLabel()}</td>
 			</tr>
 		`;
 		
