@@ -24,4 +24,5 @@
 
 .MMM-CasperValidator .tiles .number { color: yellow; font-weight: bold; }
 .MMM-CasperValidator .tiles .green { color: #A3EA80; }
+.MMM-CasperValidator .tiles .yellow { color: yellow; }
 .MMM-CasperValidator .tiles .red { color: red; }

@@ -27,12 +27,47 @@ module.exports = NodeHelper.create({
 				this.sendNodeStatus(notification, payload);
 				break;
 			case "MMM-CasperValidator-REWARDS":
-				this.sendRewards(notification, payload.validatorAddress);
+				this.sendRewards(notification, payload);
 				break;
 			case "MMM-CasperValidator-GET_AUCTION_INFO":
 				this.sendStakedInfo(payload);
 				break;
+			case "MMM-CasperValidator-GET_PERFORMANCE":
+				this.sendPerformancesInfo(payload);
+				break;
 		}
+	},
+
+	sendPerformancesInfo: async function(payload) {
+		if (payload.currentEra <= 0 ) return;
+
+		let performances = await this.getPerformances(payload);
+		let lastPerformance = performances[performances.length - 1];
+
+		this.sendSocketNotification("MMM-CasperValidator-GET_PERFORMANCE", {
+			nodeName: payload.nodeName,
+			lastPerformance: lastPerformance.average_score,
+			changes24h: lastPerformance.average_score - performances[0].average_score,
+		});
+	},
+
+	calculate24hPerformanceChanges(data) {
+
+	},
+	
+	getPerformances: function(payload) {
+		let startEra = payload.currentEra - 12;
+    let eraRange = [...Array(payload.currentEra - startEra).keys()].map(x => x + startEra);
+
+		return axios.get(`${payload.performanceApi}/validators/${payload.validatorAddress}/relative-average-performances`, {
+			params: {
+				page: 1,
+				limit: 12,
+				era_id: eraRange,
+			}
+		})
+		.then(res => res.data.data)
+		.catch(error => console.log(error));
 	},
 
 	sendStakedInfo: async function(payload) {
@@ -42,6 +77,7 @@ module.exports = NodeHelper.create({
 		let delegatorStakedAmount = bidData.bid.delegators.map(a => this.convertToCSPR(a.staked_amount)).reduce((a, b) => a + b, 0);
 
 		this.sendSocketNotification("MMM-CasperValidator-STAKED_INFO", {
+			nodeName: payload.nodeName,
 			selfStaked: selfStakedAmount,
 			totalStaked: selfStakedAmount + delegatorStakedAmount,
 			active: !bidData.bid.inactive
@@ -64,14 +100,20 @@ module.exports = NodeHelper.create({
 
 	sendNodeStatus: async function(notification, payload) {
 		let nodeStatus = await this.getCasperRPC(payload.nodeUrl);
-		this.sendSocketNotification(notification, nodeStatus);
+		this.sendSocketNotification(
+			notification,
+			{
+				nodeName: payload.nodeName,
+				...nodeStatus
+			}
+		);
 	},
 
-	sendRewards: function(notification, validatorAddress) {
+	sendRewards: function(notification, payload) {
 		var self = this;
 
-		axios.get(`https://event-store-api-clarity-mainnet.make.services/validators/${validatorAddress}/rewards?with_amounts_in_currency_id=1&page=1&limit=4&order_direction=DESC`)
-		.then(res => self.sendSocketNotification(notification, res.data) )
+		axios.get(`https://event-store-api-clarity-mainnet.make.services/validators/${payload.validatorAddress}/rewards?with_amounts_in_currency_id=1&page=1&limit=4&order_direction=DESC`)
+		.then(res => self.sendSocketNotification(notification, { nodeName: payload.nodeName, data: res.data }) )
 		.catch(error => console.log(error));
 	},
 

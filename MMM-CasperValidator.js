@@ -11,7 +11,9 @@ Module.register("MMM-CasperValidator", {
 	defaults: {
 		updateInterval: 60000,
 		retryDelay: 5000,
-		validatorAddress: ''
+		nodeName: '',
+		validatorAddress: '',
+		performanceApi: '',
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -25,6 +27,10 @@ Module.register("MMM-CasperValidator", {
 			theirNode: { era_id: 0, height: 0, next_upgrade: false },
 			ourNode: { era_id: 0, height: 0, next_upgrade: null }
 		};
+		this.performances = {
+			lastPerformance: 0,
+			changes24h: 0,
+		}
 
 		//Flag for check if module is loaded
 		this.loaded = false;
@@ -38,10 +44,11 @@ Module.register("MMM-CasperValidator", {
 	},
 
 	requestUpdate: function() {
-		this.sendSocketNotification("MMM-CasperValidator-THEIR_NODE_STATUS", { nodeUrl: this.config.theirNode });
-		this.sendSocketNotification("MMM-CasperValidator-OUR_NODE_STATUS", { nodeUrl: this.config.ourNode });
-		this.sendSocketNotification("MMM-CasperValidator-REWARDS", { validatorAddress: this.config.validatorAddress });
-		this.sendSocketNotification("MMM-CasperValidator-GET_AUCTION_INFO", { validatorAddress: this.config.validatorAddress, nodeUrl: this.config.theirNode });
+		this.sendSocketNotification("MMM-CasperValidator-THEIR_NODE_STATUS", { nodeName: this.config.nodeName, nodeUrl: this.config.theirNode });
+		this.sendSocketNotification("MMM-CasperValidator-OUR_NODE_STATUS", { nodeName: this.config.nodeName, nodeUrl: this.config.ourNode });
+		this.sendSocketNotification("MMM-CasperValidator-REWARDS", { nodeName: this.config.nodeName, validatorAddress: this.config.validatorAddress });
+		this.sendSocketNotification("MMM-CasperValidator-GET_AUCTION_INFO", { nodeName: this.config.nodeName, validatorAddress: this.config.validatorAddress, nodeUrl: this.config.theirNode });
+		this.sendSocketNotification("MMM-CasperValidator-GET_PERFORMANCE", { nodeName: this.config.nodeName, validatorAddress: this.config.validatorAddress, performanceApi: this.config.performanceApi, currentEra: this.nodeStatus.theirNode.era_id });
 	},
 
 	getLatestSerieValue: function(name, trunc, localeFormat) {
@@ -83,6 +90,11 @@ Module.register("MMM-CasperValidator", {
 				<td class="value green">${data.theirNode.height}</td>
 			</tr>
 			<tr>
+				<td>Performances</td>
+				<td class="value yellow">${this.performances.lastPerformance.toFixed(4)}%</td>
+				<td class="value ${this.performanceChangesClass(this.performances.changes24h)}">${this.performanceChangesValue(this.performances.changes24h)}</td>
+			</tr>
+			<tr>
 				<td>Node Status</td>
 				<td class="value" colspan="2">
 					<span class="${this.compareCssClass(this.isActiveNode(), true)}">${this.isActiveNodeLabel()}</span> / 
@@ -96,6 +108,17 @@ Module.register("MMM-CasperValidator", {
 
 	compareCssClass: function(a, b) {
 		return (a == b) ? "green" : "red";
+	},
+
+	performanceChangesClass: function(changes) {
+		return (changes >= 0) ? "green" : "red";
+	},
+
+	performanceChangesValue: function(changes) {
+		changes = changes.toFixed(4);
+		if (changes > 0) return `+ ${changes}%`;
+		else if (changes == 0) return `${changes}%`;
+		else return `- ${changes}%`;
 	},
 
 	isActiveNodeLabel: function() {
@@ -210,6 +233,8 @@ Module.register("MMM-CasperValidator", {
 
 	// socketNotificationReceived from helper
 	socketNotificationReceived: function (notification, payload) {
+		if (payload.nodeName != this.config.nodeName) return;
+
 		switch(notification) {
 			case "MMM-CasperValidator-THEIR_NODE_STATUS":
 				this.nodeStatus.theirNode = payload;
@@ -220,11 +245,15 @@ Module.register("MMM-CasperValidator", {
 				this.updateDom();
 				break;
 			case "MMM-CasperValidator-REWARDS":
-				this.rewardDataRequest = payload;
+				this.rewardDataRequest = payload.data;
 				this.updateDom();
 				break;
 			case "MMM-CasperValidator-STAKED_INFO":
 				this.stakedInfo = payload;
+				this.updateDom();
+				break;
+			case "MMM-CasperValidator-GET_PERFORMANCE":
+				this.performances = payload;
 				this.updateDom();
 				break;
 		}
