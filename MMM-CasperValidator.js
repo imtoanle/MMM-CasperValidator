@@ -84,11 +84,10 @@ Module.register("MMM-CasperValidator", {
 			</tr>
 			<tr>
 				<td>Node Status</td>
-				<td class="value ${this.compareCssClass(this.isActiveNode(), true)}" colspan="2">${this.isActiveNodeLabel()}</td>
-			</tr>
-			<tr>
-				<td>Upgrade Status</td>
-				<td class="value ${this.compareCssClass(this.needUpgradeNode(), false)}" colspan="2">${this.needUpgradeNodeLabel()}</td>
+				<td class="value" colspan="2">
+					<span class="${this.compareCssClass(this.isActiveNode(), true)}">${this.isActiveNodeLabel()}</span> / 
+					<span class="${this.compareCssClass(this.needUpgradeNode(), false)}">${this.needUpgradeNodeLabel()}</span>
+				</td>
 			</tr>
 		`;
 		
@@ -100,11 +99,11 @@ Module.register("MMM-CasperValidator", {
 	},
 
 	isActiveNodeLabel: function() {
-		return this.isActiveNode() ? "☘️ ACTIVE VALIDATOR ☘️" : "☠️ NOT VALIDATOR ☠️";
+		return this.isActiveNode() ? "ACTIVE" : "INACTIVE";
 	},
 
 	needUpgradeNodeLabel: function() {
-		return this.needUpgradeNode() ? "☠️ NEED UPGRADE ☠️" : "✯ LATEST VERSION ✯";
+		return this.needUpgradeNode() ? "UPGRADE" : "LATEST";
 	},
 
 	parseRewardResults: function(json) {
@@ -137,6 +136,9 @@ Module.register("MMM-CasperValidator", {
 		var wrapper = document.createElement("div");
 		let tileTable = document.createElement("table");
 		tileTable.innerHTML = `
+			<tr>
+				<td colspan="3" class='bright align-center'>${this.config.validatorAddress}</td>
+			</tr>
 			<tr>
 				<td class='bright align-center'>Total Self Staked</td>
 				<td></td>
