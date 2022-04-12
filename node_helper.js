@@ -44,11 +44,13 @@ module.exports = NodeHelper.create({
 		let performances = await this.getPerformances(payload);
 		let lastPerformance = performances[performances.length - 1];
 
-		this.sendSocketNotification("MMM-CasperValidator-GET_PERFORMANCE", {
-			nodeName: payload.nodeName,
-			lastPerformance: lastPerformance.average_score,
-			changes24h: lastPerformance.average_score - performances[0].average_score,
-		});
+		if (lastPerformance) {
+			this.sendSocketNotification("MMM-CasperValidator-GET_PERFORMANCE", {
+				nodeName: payload.nodeName,
+				lastPerformance: lastPerformance.average_score,
+				changes24h: lastPerformance.average_score - performances[0].average_score,
+			});
+		}
 	},
 
 	calculate24hPerformanceChanges(data) {
