@@ -41,7 +41,7 @@ module.exports = NodeHelper.create({
 	sendPerformancesInfo: async function(payload) {
 		if (payload.currentEra <= 0 ) return;
 
-		let performances = await this.getPerformances(payload);
+		let performances = (await this.getPerformances(payload)) ?? [];
 		let lastPerformance = performances[performances.length - 1];
 
 		if (lastPerformance) {
